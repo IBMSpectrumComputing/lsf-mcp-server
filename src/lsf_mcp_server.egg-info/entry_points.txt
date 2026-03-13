@@ -1,0 +1,2 @@
+[console_scripts]
+lsf-mcp-server = lsf_mcp_server.server:main

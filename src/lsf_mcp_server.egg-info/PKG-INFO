@@ -1,0 +1,462 @@
+Metadata-Version: 2.4
+Name: lsf-mcp-server
+Version: 0.1.0
+Summary: MCP server for IBM Spectrum LSF job management and file operations
+Author: LSF MCP Server Contributors
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: mcp>=1.0.0
+Requires-Dist: httpx>=0.27.0
+Requires-Dist: pydantic>=2.0.0
+Requires-Dist: anyio>=4.0.0
+Provides-Extra: dev
+Requires-Dist: pytest>=8.0.0; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.23.0; extra == "dev"
+Requires-Dist: pytest-httpx>=0.30.0; extra == "dev"
+Dynamic: license-file
+
+# LSF MCP Server
+
+A Model Context Protocol (MCP) server for IBM Spectrum LSF (Load Sharing Facility) that provides comprehensive job management and file operation capabilities through the LSF REST API.
+
+## Features
+
+### Job Management (3 tools)
+- **submit_job** - Submit jobs with simple or advanced options
+- **query_jobs** - Query job status with flexible filtering
+- **kill_job** - Terminate running or pending jobs
+
+### Cluster Information (6 tools)
+- **list_hosts** - List cluster hosts with status and load
+- **list_queues** - List available queues and their configuration
+- **check_load** - Check system load on hosts
+- **list_host_info** - Get detailed host information
+- **get_cluster_id** - Get LSF cluster identifier and version
+- **get_cluster_info** - Get comprehensive cluster information via API
+
+### File Operations (4 tools)
+- **upload_file** - Upload files to LSF server
+- **download_file** - Download files from LSF server
+- **list_files** - List files in directories
+- **delete_file** - Delete files on LSF server
+
+## Requirements
+
+- Python 3.10 or higher
+- Access to an LSF REST API server
+- LSF credentials (username and password)
+
+## Installation
+
+### 1. Clone or Download
+
+```bash
+# Clone the repository or download and extract the source code
+cd lsf-mcp-server
+```
+
+### 2. Create Virtual Environment
+
+```bash
+# Use Python 3.10 or higher
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -e .
+```
+
+## Configuration
+
+### MCP Settings File
+
+The MCP server is configured through IBM Bob's settings file. You need to manually edit this file to add your LSF credentials.
+
+**Settings File Location:**
+```
+~/Library/Application Support/IBM Bob/User/globalStorage/ibm.bob-code/settings/mcp_settings.json
+```
+
+### Configuration Steps
+
+1. Open the MCP settings file in a text editor
+2. Add the LSF MCP server configuration:
+
+```json
+{
+  "mcpServers": {
+    "lsf": {
+      "command": "/absolute/path/to/lsf-mcp-server/venv/bin/python",
+      "args": ["-m", "lsf_mcp_server.server"],
+      "env": {
+        "LSF_SERVER_URL": "http://party1.dev.fyre.ibm.com:8088",
+        "LSF_USERNAME": "your-lsf-username",
+        "LSF_PASSWORD": "your-lsf-password"
+      }
+    }
+  }
+}
+```
+
+3. Replace the placeholder values:
+   - `command`: **Use the absolute path to your venv Python binary** (e.g., `/Users/username/lsf-mcp-server/venv/bin/python`)
+   - `LSF_SERVER_URL`: Your LSF REST API server URL
+   - `LSF_USERNAME`: Your LSF username
+   - `LSF_PASSWORD`: Your LSF password
+
+4. Save the file and restart IBM Bob
+
+**Important:** The `command` field must point to the Python binary inside your virtual environment. This ensures Bob uses the correct Python with all required dependencies installed. Do not use just `"python"` as it may not find the installed packages.
+
+## Usage
+
+Once configured, you can interact with the LSF MCP server through IBM Bob using natural language. Here are some examples:
+
+### Job Management
+
+**Submit a simple job:**
+```
+Submit a job to run 'hostname' on the LSF cluster
+```
+
+**Submit a job with specific resources:**
+```
+Submit a job named 'my-analysis' to run 'python analyze.py' on queue 'normal' with 4 processors and 8GB memory
+```
+
+**Submit a job with advanced options:**
+```
+Submit a job with advanced options: -J myjob -q normal -n 8 -R "span[ptile=4]" -W 2:00 ./run.sh
+```
+
+**Query all jobs:**
+```
+Show me all my LSF jobs
+```
+
+**Query a specific job:**
+```
+What's the status of job 12345?
+```
+
+**Query jobs in a queue:**
+```
+Show me all jobs in the 'normal' queue
+```
+
+**Kill a job:**
+```
+Kill job 12345
+```
+
+### Cluster Information
+
+**List all hosts:**
+```
+List all hosts in the LSF cluster
+```
+
+**Check specific host:**
+```
+Show me information about host node01
+```
+
+**List queues:**
+```
+What queues are available?
+```
+
+**Check system load:**
+```
+What's the current load on the cluster?
+```
+
+**Get cluster ID:**
+```
+What's the LSF cluster ID?
+```
+
+### File Operations
+
+**Upload a file:**
+```
+Upload mydata.txt to /home/user/data/ on the LSF server
+```
+
+**Download a file:**
+```
+Download /home/user/results.txt from the LSF server
+```
+
+**List files:**
+```
+List files in /home/user/jobs/ on the LSF server
+```
+
+**Delete a file:**
+```
+Delete /home/user/temp/old_file.txt on the LSF server
+```
+
+## Tool Reference
+
+### submit_job
+
+Submit a job to the LSF cluster.
+
+**Parameters:**
+- `command` (required): Command to execute
+- `job_name` (optional): Job name
+- `queue` (optional): Queue name
+- `num_processors` (optional): Number of processors
+- `memory_mb` (optional): Memory in MB
+- `wall_time` (optional): Wall time limit (HH:MM format)
+- `output_file` (optional): Standard output file path
+- `error_file` (optional): Standard error file path
+- `working_directory` (optional): Working directory
+- `advanced_options` (optional): Full LSF options string for advanced control
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "command": "bsub -J myjob hostname",
+  "result": {
+    "jobId": "12345",
+    "status": "submitted"
+  }
+}
+```
+
+### query_jobs
+
+Query job status and information.
+
+**Parameters:**
+- `job_id` (optional): Specific job ID to query
+- `user` (optional): Filter by username
+- `queue` (optional): Filter by queue name
+- `status` (optional): Filter by job status
+
+**Example Response:**
+```json
+{
+  "success": true,
+  "result": {
+    "jobs": [
+      {
+        "jobid": "12345",
+        "stat": "RUN",
+        "queue": "normal",
+        "user": "username",
+        "job_name": "myjob"
+      }
+    ]
+  }
+}
+```
+
+### kill_job
+
+Kill a running or pending job.
+
+**Parameters:**
+- `job_id` (required): Job ID to kill
+- `force` (optional): Force kill (default: false)
+
+### list_hosts
+
+List LSF cluster hosts.
+
+**Parameters:**
+- `host_name` (optional): Specific host to query
+
+### list_queues
+
+List available LSF queues.
+
+**Parameters:**
+- `queue_name` (optional): Specific queue to query
+
+### check_load
+
+Check system load on hosts.
+
+**Parameters:**
+- `host_name` (optional): Specific host to check
+
+### list_host_info
+
+Get detailed host information.
+
+**Parameters:**
+- `host_name` (optional): Specific host to query
+
+### get_cluster_id
+
+Get LSF cluster identifier and version.
+
+**Parameters:** None
+
+### get_cluster_info
+
+Get comprehensive cluster information via API.
+
+**Parameters:** None
+
+### upload_file
+
+Upload a file to the LSF server.
+
+**Parameters:**
+- `local_path` (required): Path to local file
+- `remote_path` (required): Destination path on LSF server
+
+### download_file
+
+Download a file from the LSF server.
+
+**Parameters:**
+- `remote_path` (required): Path on LSF server
+- `local_path` (optional): Local destination (returns content if not provided)
+
+### list_files
+
+List files in a directory.
+
+**Parameters:**
+- `path` (required): Directory path to list
+
+### delete_file
+
+Delete a file on the LSF server.
+
+**Parameters:**
+- `file_path` (required): Path to file to delete
+
+## Architecture
+
+The LSF MCP server runs locally on your machine and communicates with:
+1. **IBM Bob** via stdio (standard input/output)
+2. **LSF REST API** via HTTP
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Your Local Machine                       │
+│                                                              │
+│  ┌────────────────┐         stdio          ┌──────────────┐ │
+│  │   IBM Bob      │◄──────────────────────►│  LSF MCP     │ │
+│  │  (AI Client)   │   (stdin/stdout)       │   Server     │ │
+│  └────────────────┘                        └──────┬───────┘ │
+│                                                    │         │
+└────────────────────────────────────────────────────┼─────────┘
+                                                     │
+                                                     │ HTTP
+                                                     ▼
+                                    ┌────────────────────────────┐
+                                    │   LSF REST API Server      │
+                                    │ party1.dev.fyre.ibm.com    │
+                                    │         :8088              │
+                                    └────────────────────────────┘
+```
+
+## Security
+
+- **Credentials**: Stored in environment variables (not in code)
+- **Session Management**: Automatic login/logout with token storage
+- **Local Execution**: All code runs on your machine with your permissions
+- **No Cloud Storage**: Credentials never leave your machine
+
+## Troubleshooting
+
+### Server Won't Start
+
+**Problem:** MCP server fails to start
+
+**Solutions:**
+1. Check that all environment variables are set correctly in `mcp_settings.json`
+2. Verify Python 3.10+ is being used
+3. Ensure the virtual environment is activated
+4. Check the LSF server URL is accessible
+
+### Authentication Fails
+
+**Problem:** Cannot authenticate with LSF server
+
+**Solutions:**
+1. Verify your LSF username and password are correct
+2. Check that the LSF REST API server is running
+3. Ensure you have network access to the LSF server
+4. Check the server logs for detailed error messages
+
+### Tool Execution Fails
+
+**Problem:** Tools return errors
+
+**Solutions:**
+1. Check that you're authenticated (server handles this automatically)
+2. Verify the LSF command syntax is correct
+3. Ensure you have permissions for the requested operation
+4. Check the LSF server logs for more details
+
+### View Server Logs
+
+Server logs are written to stderr and can be viewed in IBM Bob's output panel or terminal.
+
+## Development
+
+### Project Structure
+
+```
+lsf-mcp-server/
+├── src/
+│   └── lsf_mcp_server/
+│       ├── __init__.py
+│       ├── server.py           # Main MCP server
+│       ├── lsf_client.py       # LSF REST API client
+│       ├── auth.py             # Authentication manager
+│       ├── models.py           # Pydantic models
+│       └── tools/
+│           ├── __init__.py
+│           ├── jobs.py         # Job management tools
+│           ├── cluster.py      # Cluster information tools
+│           └── files.py        # File operation tools
+├── pyproject.toml              # Project configuration
+├── README.md                   # This file
+└── LICENSE
+```
+
+### Running Tests
+
+```bash
+# Install dev dependencies
+pip install -e ".[dev]"
+
+# Run tests (when implemented)
+pytest
+```
+
+## License
+
+See LICENSE file for details.
+
+## Support
+
+For issues, questions, or contributions, please refer to the project repository.
+
+## Version
+
+Current version: 0.1.0
+
+## Changelog
+
+### 0.1.0 (2026-02-25)
+- Initial release
+- 13 tools for LSF job management, cluster information, and file operations
+- Support for LSF REST API authentication
+- Comprehensive error handling
+- Full MCP protocol implementation
