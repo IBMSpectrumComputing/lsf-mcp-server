@@ -392,7 +392,7 @@ See LICENSE file for details.
 
 ## Support
 
-This code is provided as-is without official support from IBM. For issues, questions, or contributions, please refer to the project repository.
+This project is provided as-is and is not officially supported by IBM.
 
 ## Version
 
