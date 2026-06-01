@@ -24,11 +24,11 @@ logger = logging.getLogger(__name__)
 
 class AuthManager:
     """Manages authentication with LSF REST API."""
-    
+
     def __init__(self, client: LSFClient, username: str, password: str):
         """
         Initialize authentication manager.
-        
+
         Args:
             client: LSF API client
             username: LSF username
@@ -38,18 +38,18 @@ class AuthManager:
         self.username = username
         self.password = password
         self.session_info: Optional[Dict] = None
-        
+
     async def login(self) -> Dict:
         """
         Authenticate with LSF REST API.
-        
+
         Returns:
             Session information from the API
-            
+
         Raises:
             Exception: If authentication fails
         """
-        logger.info("Logging in as user: %s", self.username)
+        logger.info("Logging in as user: {self.username}")
 
         try:
             response = await self.client.post(
@@ -60,9 +60,9 @@ class AuthManager:
                     'pass': self.password
                 }
             )
-            
+
             session_data = response.json()
-            
+
             # Extract session token from response
             # The token is typically in the Set-Cookie header or response body
             if 'token' in session_data:
@@ -74,52 +74,52 @@ class AuthManager:
                     token = cookies['LSF_SESSION']
                 else:
                     raise Exception("No session token found in response")
-            
+
             self.client.set_session_token(token)
             self.session_info = session_data
-            
+
             logger.info("Successfully authenticated with LSF API")
             return session_data
-            
+
         except Exception as e:
             logger.error("Authentication failed: %s", str(e))
             raise Exception(f"Failed to authenticate with LSF API: {str(e)}")
-            
+
     async def logout(self):
         """
         Log out from LSF REST API.
-        
+
         Raises:
             Exception: If logout fails
         """
         if not self.session_info:
             logger.warning("No active session to logout")
             return
-            
+
         logger.info("Logging out from LSF API")
-        
+
         try:
             await self.client.post('/lsf/v1/auth/logout')
             self.client.clear_session_token()
             self.session_info = None
             logger.info("Successfully logged out")
-            
+
         except Exception as e:
             logger.error("Logout failed: %s", str(e))
             # Clear session anyway
             self.client.clear_session_token()
             self.session_info = None
-            
+
     async def ensure_authenticated(self):
         """
         Ensure we have a valid session, re-authenticate if needed.
-        
+
         This method can be called before making API requests to ensure
         the session is still valid.
         """
         if not self.session_info:
             await self.login()
-            
+
     def is_authenticated(self) -> bool:
         """Check if currently authenticated."""
         return self.session_info is not None

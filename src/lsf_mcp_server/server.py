@@ -41,37 +41,37 @@ logger = logging.getLogger(__name__)
 
 class LSFMCPServer:
     """MCP Server for LSF operations."""
-    
+
     def __init__(self):
         """Initialize the LSF MCP server."""
         self.server = Server("lsf-mcp-server")
-        
+
         # Get configuration from environment
         self.lsf_url = os.getenv('LSF_SERVER_URL')
         self.lsf_username = os.getenv('LSF_USERNAME')
         self.lsf_password = os.getenv('LSF_PASSWORD')
-        
+
         if not all([self.lsf_url, self.lsf_username, self.lsf_password]):
             raise ValueError(
                 "Missing required environment variables: "
                 "LSF_SERVER_URL, LSF_USERNAME, LSF_PASSWORD"
             )
-            
+
         # Initialize LSF client and auth
         self.client = LSFClient(self.lsf_url)
         self.auth = AuthManager(self.client, self.lsf_username, self.lsf_password)
-        
+
         # Initialize tool handlers
         self.job_tools = JobTools(self.client, self.auth)
         self.cluster_tools = ClusterTools(self.client, self.auth)
         self.file_tools = FileTools(self.client, self.auth)
-        
+
         # Register handlers
         self._register_handlers()
-        
+
     def _register_handlers(self):
         """Register MCP server handlers."""
-        
+
         @self.server.list_tools()
         async def list_tools() -> list[Tool]:
             """List available tools."""
@@ -302,7 +302,7 @@ class LSFMCPServer:
                     }
                 )
             ]
-            
+
         @self.server.call_tool()
         async def call_tool(name: str, arguments: Any) -> Sequence[TextContent]:
             """Handle tool calls."""
@@ -340,9 +340,9 @@ class LSFMCPServer:
 
                 # Format result as JSON string
                 result_text = json.dumps(result, indent=2)
-                
+
                 return [TextContent(type="text", text=result_text)]
-                
+
             except Exception as e:
                 logger.error("Error executing tool %s: %s", name, str(e))
                 error_result = {
@@ -351,7 +351,7 @@ class LSFMCPServer:
                     "tool": name
                 }
                 return [TextContent(type="text", text=json.dumps(error_result, indent=2))]
-                
+
     async def run(self):
         """Run the MCP server."""
         logger.info("Starting LSF MCP Server")
@@ -362,7 +362,7 @@ class LSFMCPServer:
             # Don't authenticate immediately - let ensure_authenticated() handle it
             # This prevents the server from crashing if LSF is temporarily unavailable
             logger.info("LSF MCP Server initialized (authentication will occur on first request)")
-            
+
             # Run the server
             async with stdio_server() as (read_stream, write_stream):
                 logger.info("LSF MCP Server is ready")
@@ -371,7 +371,7 @@ class LSFMCPServer:
                     write_stream,
                     self.server.create_initialization_options()
                 )
-                
+
         except Exception as e:
             logger.error("Server error: %s", str(e))
             raise
