@@ -58,8 +58,8 @@ class LSFMCPServer:
             )
 
         # Initialize LSF client and auth
-        self.client = LSFClient(self.lsf_url)
-        self.auth = AuthManager(self.client, self.lsf_username, self.lsf_password)
+        self.client = LSFClient(str(self.lsf_url))
+        self.auth = AuthManager(self.client, str(self.lsf_username), str(self.lsf_password))
 
         # Initialize tool handlers
         self.job_tools = JobTools(self.client, self.auth)
