@@ -19,7 +19,6 @@ from typing import Dict, Any, Optional
 from ..lsf_client import LSFClient
 from ..auth import AuthManager
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -47,7 +46,7 @@ class JobTools:
         wall_time: Optional[str] = None,
         output_file: Optional[str] = None,
         error_file: Optional[str] = None,
-        working_directory: Optional[str] = None
+        working_directory: Optional[str] = None,
     ) -> str:
         """Build a bsub command string from parameters."""
         cmd_parts = ["bsub"]
@@ -91,7 +90,7 @@ class JobTools:
         output_file: Optional[str] = None,
         error_file: Optional[str] = None,
         working_directory: Optional[str] = None,
-        advanced_options: Optional[str] = None
+        advanced_options: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Submit a job to LSF.
@@ -118,43 +117,41 @@ class JobTools:
             lsf_command = f"bsub {advanced_options} {command}"
         else:
             lsf_command = self._build_bsub_command(
-                command, job_name, queue, num_processors,
-                memory_mb, wall_time, output_file, error_file,
-                working_directory
+                command,
+                job_name,
+                queue,
+                num_processors,
+                memory_mb,
+                wall_time,
+                output_file,
+                error_file,
+                working_directory,
             )
 
         logger.info("Submitting job: %s", lsf_command)
 
         try:
             response = await self.client.post(
-                '/lsf/v1/cluster/usercmd',
-                data={'command': lsf_command, 'env': ''},
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                "/lsf/v1/cluster/usercmd",
+                data={"command": lsf_command, "env": ""},
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
             )
 
             result = response.json()
             logger.info("Job submitted successfully: %s", result)
 
-            return {
-                'success': True,
-                'command': lsf_command,
-                'result': result
-            }
+            return {"success": True, "command": lsf_command, "result": result}
 
         except Exception as e:
             logger.error("Failed to submit job: %s", str(e))
-            return {
-                'success': False,
-                'error': str(e),
-                'command': lsf_command
-            }
+            return {"success": False, "error": str(e), "command": lsf_command}
 
     async def query_jobs(
         self,
         job_id: Optional[str] = None,
         user: Optional[str] = None,
         queue: Optional[str] = None,
-        status: Optional[str] = None
+        status: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Query job status and information.
@@ -184,7 +181,9 @@ class JobTools:
             cmd_parts.append("-a")
 
         # Request JSON output with detailed fields
-        cmd_parts.append("-o 'jobid stat queue user job_name submit_time start_time finish_time run_time cpu_used mem max_mem' -json")
+        cmd_parts.append(
+            "-o 'jobid stat queue user job_name submit_time start_time finish_time run_time cpu_used mem max_mem' -json"
+        )
 
         # Job ID must come last
         if job_id:
@@ -195,33 +194,21 @@ class JobTools:
 
         try:
             response = await self.client.post(
-                '/lsf/v1/cluster/usercmd',
-                data={'command': lsf_command, 'env': ''},
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                "/lsf/v1/cluster/usercmd",
+                data={"command": lsf_command, "env": ""},
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
             )
 
             result = response.json()
             logger.info("Job query successful")
 
-            return {
-                'success': True,
-                'command': lsf_command,
-                'result': result
-            }
+            return {"success": True, "command": lsf_command, "result": result}
 
         except Exception as e:
             logger.error("Failed to query jobs: %s", str(e))
-            return {
-                'success': False,
-                'error': str(e),
-                'command': lsf_command
-            }
+            return {"success": False, "error": str(e), "command": lsf_command}
 
-    async def kill_job(
-        self,
-        job_id: str,
-        force: bool = False
-    ) -> Dict[str, Any]:
+    async def kill_job(self, job_id: str, force: bool = False) -> Dict[str, Any]:
         """
         Kill a running or pending job.
 
@@ -247,26 +234,26 @@ class JobTools:
 
         try:
             response = await self.client.post(
-                '/lsf/v1/cluster/usercmd',
-                data={'command': lsf_command, 'env': ''},
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                "/lsf/v1/cluster/usercmd",
+                data={"command": lsf_command, "env": ""},
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
             )
 
             result = response.json()
             logger.info("Job killed successfully: %s", result)
 
             return {
-                'success': True,
-                'job_id': job_id,
-                'command': lsf_command,
-                'result': result
+                "success": True,
+                "job_id": job_id,
+                "command": lsf_command,
+                "result": result,
             }
 
         except Exception as e:
             logger.error("Failed to kill job: %s", str(e))
             return {
-                'success': False,
-                'error': str(e),
-                'job_id': job_id,
-                'command': lsf_command
+                "success": False,
+                "error": str(e),
+                "job_id": job_id,
+                "command": lsf_command,
             }

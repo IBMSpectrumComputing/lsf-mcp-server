@@ -19,7 +19,6 @@ from typing import Dict, Any, Optional
 from ..lsf_client import LSFClient
 from ..auth import AuthManager
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -53,27 +52,19 @@ class ClusterTools:
 
         try:
             response = await self.client.post(
-                '/lsf/v1/cluster/usercmd',
-                data={'command': command, 'env': ''},
-                headers={'Content-Type': 'application/x-www-form-urlencoded'}
+                "/lsf/v1/cluster/usercmd",
+                data={"command": command, "env": ""},
+                headers={"Content-Type": "application/x-www-form-urlencoded"},
             )
 
             result = response.json()
             logger.info("Command executed successfully")
 
-            return {
-                'success': True,
-                'command': command,
-                'result': result
-            }
+            return {"success": True, "command": command, "result": result}
 
         except Exception as e:
             logger.error("Failed to execute command: %s", str(e))
-            return {
-                'success': False,
-                'error': str(e),
-                'command': command
-            }
+            return {"success": False, "error": str(e), "command": command}
 
     async def list_hosts(self, host_name: Optional[str] = None) -> Dict[str, Any]:
         """
@@ -161,19 +152,13 @@ class ClusterTools:
         logger.info("Getting cluster information via API")
 
         try:
-            response = await self.client.get('/lsf/v1/cluster')
+            response = await self.client.get("/lsf/v1/cluster")
             result = response.json()
 
             logger.info("Cluster information retrieved successfully")
 
-            return {
-                'success': True,
-                'result': result
-            }
+            return {"success": True, "result": result}
 
         except Exception as e:
             logger.error("Failed to get cluster info: %s", str(e))
-            return {
-                'success': False,
-                'error': str(e)
-            }
+            return {"success": False, "error": str(e)}

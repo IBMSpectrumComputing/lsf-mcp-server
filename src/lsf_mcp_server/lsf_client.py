@@ -19,7 +19,6 @@ import httpx
 import logging
 from typing import Dict, Optional
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -34,7 +33,7 @@ class LSFClient:
             base_url: Base URL of the LSF REST API (e.g., http://host:8088)
             timeout: Request timeout in seconds
         """
-        self.base_url = base_url.rstrip('/')
+        self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.session_token: Optional[str] = None
         self._client = httpx.AsyncClient(timeout=timeout)
@@ -51,7 +50,9 @@ class LSFClient:
         """Clear the session token."""
         self.session_token = None
 
-    def _get_headers(self, additional_headers: Optional[Dict[str, str]] = None) -> Dict[str, str]:
+    def _get_headers(
+        self, additional_headers: Optional[Dict[str, str]] = None
+    ) -> Dict[str, str]:
         """
         Get headers for requests, including session token if available.
 
@@ -64,19 +65,14 @@ class LSFClient:
         headers = {}
 
         if self.session_token:
-            headers['Authorization'] = self.session_token
+            headers["Authorization"] = self.session_token
 
         if additional_headers:
             headers.update(additional_headers)
 
         return headers
 
-    async def request(
-        self,
-        method: str,
-        endpoint: str,
-        **kwargs
-    ) -> httpx.Response:
+    async def request(self, method: str, endpoint: str, **kwargs) -> httpx.Response:
         """
         Make an HTTP request to the LSF API.
 
@@ -94,16 +90,13 @@ class LSFClient:
         url = f"{self.base_url}{endpoint}"
 
         # Merge headers
-        headers = self._get_headers(kwargs.pop('headers', None))
+        headers = self._get_headers(kwargs.pop("headers", None))
 
         logger.debug("%s %s", method, url)
 
         try:
             response = await self._client.request(
-                method=method,
-                url=url,
-                headers=headers,
-                **kwargs
+                method=method, url=url, headers=headers, **kwargs
             )
 
             logger.debug("Response status: %s", response.status_code)
@@ -122,15 +115,15 @@ class LSFClient:
 
     async def get(self, endpoint: str, **kwargs) -> httpx.Response:
         """Make a GET request."""
-        return await self.request('GET', endpoint, **kwargs)
+        return await self.request("GET", endpoint, **kwargs)
 
     async def post(self, endpoint: str, **kwargs) -> httpx.Response:
         """Make a POST request."""
-        return await self.request('POST', endpoint, **kwargs)
+        return await self.request("POST", endpoint, **kwargs)
 
     async def delete(self, endpoint: str, **kwargs) -> httpx.Response:
         """Make a DELETE request."""
-        return await self.request('DELETE', endpoint, **kwargs)
+        return await self.request("DELETE", endpoint, **kwargs)
 
     @staticmethod
     def encode_path(path: str) -> str:

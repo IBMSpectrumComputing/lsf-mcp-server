@@ -18,7 +18,6 @@ import logging
 from typing import Dict, Optional
 from .lsf_client import LSFClient
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -53,25 +52,25 @@ class AuthManager:
 
         try:
             response = await self.client.post(
-                '/lsf/v1/auth/logon',
+                "/lsf/v1/auth/logon",
                 json={
-                    'name': self.username,
-                    'originalName': self.username,
-                    'pass': self.password
-                }
+                    "name": self.username,
+                    "originalName": self.username,
+                    "pass": self.password,
+                },
             )
 
             session_data = response.json()
 
             # Extract session token from response
             # The token is typically in the Set-Cookie header or response body
-            if 'token' in session_data:
-                token = session_data['token']
+            if "token" in session_data:
+                token = session_data["token"]
             else:
                 # Try to extract from cookies
                 cookies = response.cookies
-                if 'LSF_SESSION' in cookies:
-                    token = cookies['LSF_SESSION']
+                if "LSF_SESSION" in cookies:
+                    token = cookies["LSF_SESSION"]
                 else:
                     raise Exception("No session token found in response")
 
@@ -99,7 +98,7 @@ class AuthManager:
         logger.info("Logging out from LSF API")
 
         try:
-            await self.client.post('/lsf/v1/auth/logout')
+            await self.client.post("/lsf/v1/auth/logout")
             self.client.clear_session_token()
             self.session_info = None
             logger.info("Successfully logged out")

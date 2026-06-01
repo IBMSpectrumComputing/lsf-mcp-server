@@ -24,13 +24,17 @@ class JobSubmitRequest(BaseModel):
     command: str = Field(..., description="Command to execute")
     job_name: Optional[str] = Field(None, description="Job name")
     queue: Optional[str] = Field(None, description="Queue name")
-    num_processors: Optional[int] = Field(None, description="Number of processors", ge=1)
+    num_processors: Optional[int] = Field(
+        None, description="Number of processors", ge=1
+    )
     memory_mb: Optional[int] = Field(None, description="Memory in MB", ge=1)
     wall_time: Optional[str] = Field(None, description="Wall time limit (HH:MM format)")
     output_file: Optional[str] = Field(None, description="Standard output file path")
     error_file: Optional[str] = Field(None, description="Standard error file path")
     working_directory: Optional[str] = Field(None, description="Working directory")
-    advanced_options: Optional[str] = Field(None, description="Advanced LSF options string")
+    advanced_options: Optional[str] = Field(
+        None, description="Advanced LSF options string"
+    )
 
 
 class JobQueryRequest(BaseModel):
@@ -60,7 +64,9 @@ class FileDownloadRequest(BaseModel):
     """Request model for file download."""
 
     remote_path: str = Field(..., description="Remote file path on LSF server")
-    local_path: Optional[str] = Field(None, description="Local destination path (optional)")
+    local_path: Optional[str] = Field(
+        None, description="Local destination path (optional)"
+    )
 
 
 class FileListRequest(BaseModel):

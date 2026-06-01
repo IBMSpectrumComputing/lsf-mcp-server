@@ -22,7 +22,6 @@ from typing import Dict, Any, Optional
 from ..lsf_client import LSFClient
 from ..auth import AuthManager
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -40,11 +39,7 @@ class FileTools:
         self.client = client
         self.auth = auth
 
-    async def upload_file(
-        self,
-        local_path: str,
-        remote_path: str
-    ) -> Dict[str, Any]:
+    async def upload_file(self, local_path: str, remote_path: str) -> Dict[str, Any]:
         """
         Upload a file to the LSF server.
 
@@ -65,46 +60,36 @@ class FileTools:
                 raise FileNotFoundError(f"Local file not found: {local_path}")
 
             # Read file content
-            with open(local_path, 'rb') as f:
+            with open(local_path, "rb") as f:
                 file_content = f.read()
 
             # Prepare multipart form data
-            files = {
-                'file': (os.path.basename(local_path), file_content)
-            }
-            data = {
-                'path': remote_path
-            }
+            files = {"file": (os.path.basename(local_path), file_content)}
+            data = {"path": remote_path}
 
-            response = await self.client.post(
-                '/lsf/v1/files',
-                files=files,
-                data=data
-            )
+            response = await self.client.post("/lsf/v1/files", files=files, data=data)
 
             result = response.json()
             logger.info("File uploaded successfully")
 
             return {
-                'success': True,
-                'local_path': local_path,
-                'remote_path': remote_path,
-                'result': result
+                "success": True,
+                "local_path": local_path,
+                "remote_path": remote_path,
+                "result": result,
             }
 
         except Exception as e:
             logger.error("Failed to upload file: %s", str(e))
             return {
-                'success': False,
-                'error': str(e),
-                'local_path': local_path,
-                'remote_path': remote_path
+                "success": False,
+                "error": str(e),
+                "local_path": local_path,
+                "remote_path": remote_path,
             }
 
     async def download_file(
-        self,
-        remote_path: str,
-        local_path: Optional[str] = None
+        self, remote_path: str, local_path: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Download a file from the LSF server.
@@ -124,39 +109,35 @@ class FileTools:
             # Encode the remote path as base64
             encoded_path = self.client.encode_path(remote_path)
 
-            response = await self.client.get(f'/lsf/v1/files/{encoded_path}')
+            response = await self.client.get(f"/lsf/v1/files/{encoded_path}")
 
             # If local_path is provided, save to file
             if local_path:
-                with open(local_path, 'wb') as f:
+                with open(local_path, "wb") as f:
                     f.write(response.content)
 
                 logger.info("File downloaded and saved to: %s", local_path)
 
                 return {
-                    'success': True,
-                    'remote_path': remote_path,
-                    'local_path': local_path,
-                    'size_bytes': len(response.content)
+                    "success": True,
+                    "remote_path": remote_path,
+                    "local_path": local_path,
+                    "size_bytes": len(response.content),
                 }
             else:
                 # Return content as text
                 logger.info("File downloaded successfully")
 
                 return {
-                    'success': True,
-                    'remote_path': remote_path,
-                    'content': response.text,
-                    'size_bytes': len(response.content)
+                    "success": True,
+                    "remote_path": remote_path,
+                    "content": response.text,
+                    "size_bytes": len(response.content),
                 }
 
         except Exception as e:
             logger.error("Failed to download file: %s", str(e))
-            return {
-                'success': False,
-                'error': str(e),
-                'remote_path': remote_path
-            }
+            return {"success": False, "error": str(e), "remote_path": remote_path}
 
     async def list_files(self, path: str) -> Dict[str, Any]:
         """
@@ -173,27 +154,16 @@ class FileTools:
         logger.info("Listing files in: %s", path)
 
         try:
-            response = await self.client.get(
-                '/lsf/v1/files',
-                params={'path': path}
-            )
+            response = await self.client.get("/lsf/v1/files", params={"path": path})
 
             result = response.json()
             logger.info("Files listed successfully")
 
-            return {
-                'success': True,
-                'path': path,
-                'result': result
-            }
+            return {"success": True, "path": path, "result": result}
 
         except Exception as e:
             logger.error("Failed to list files: %s", str(e))
-            return {
-                'success': False,
-                'error': str(e),
-                'path': path
-            }
+            return {"success": False, "error": str(e), "path": path}
 
     async def delete_file(self, file_path: str) -> Dict[str, Any]:
         """
@@ -213,20 +183,12 @@ class FileTools:
             # Encode the file path as base64
             encoded_path = self.client.encode_path(file_path)
 
-            response = await self.client.delete(f'/lsf/v1/files/{encoded_path}')
+            response = await self.client.delete(f"/lsf/v1/files/{encoded_path}")
 
             result = response.json()
             logger.info("File deleted successfully")
 
-            return {
-                'success': True,
-                'file_path': file_path,
-                'result': result
-            }
+            return {"success": True, "file_path": file_path, "result": result}
         except Exception as e:
             logger.error("Failed to delete file: %s", str(e))
-            return {
-                'success': False,
-                'error': str(e),
-                'file_path': file_path
-            }
+            return {"success": False, "error": str(e), "file_path": file_path}

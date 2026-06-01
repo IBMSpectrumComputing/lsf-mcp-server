@@ -29,12 +29,11 @@ from .lsf_client import LSFClient
 from .auth import AuthManager
 from .tools import JobTools, ClusterTools, FileTools
 
-
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    stream=sys.stderr
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    stream=sys.stderr,
 )
 logger = logging.getLogger(__name__)
 
@@ -47,9 +46,9 @@ class LSFMCPServer:
         self.server = Server("lsf-mcp-server")
 
         # Get configuration from environment
-        self.lsf_url = os.getenv('LSF_SERVER_URL')
-        self.lsf_username = os.getenv('LSF_USERNAME')
-        self.lsf_password = os.getenv('LSF_PASSWORD')
+        self.lsf_url = os.getenv("LSF_SERVER_URL")
+        self.lsf_username = os.getenv("LSF_USERNAME")
+        self.lsf_password = os.getenv("LSF_PASSWORD")
 
         if not all([self.lsf_url, self.lsf_username, self.lsf_password]):
             raise ValueError(
@@ -59,7 +58,9 @@ class LSFMCPServer:
 
         # Initialize LSF client and auth
         self.client = LSFClient(str(self.lsf_url))
-        self.auth = AuthManager(self.client, str(self.lsf_username), str(self.lsf_password))
+        self.auth = AuthManager(
+            self.client, str(self.lsf_username), str(self.lsf_password)
+        )
 
         # Initialize tool handlers
         self.job_tools = JobTools(self.client, self.auth)
@@ -84,47 +85,47 @@ class LSFMCPServer:
                         "properties": {
                             "command": {
                                 "type": "string",
-                                "description": "Command to execute"
+                                "description": "Command to execute",
                             },
                             "job_name": {
                                 "type": "string",
-                                "description": "Job name (optional)"
+                                "description": "Job name (optional)",
                             },
                             "queue": {
                                 "type": "string",
-                                "description": "Queue name (optional)"
+                                "description": "Queue name (optional)",
                             },
                             "num_processors": {
                                 "type": "integer",
-                                "description": "Number of processors (optional)"
+                                "description": "Number of processors (optional)",
                             },
                             "memory_mb": {
                                 "type": "integer",
-                                "description": "Memory in MB (optional)"
+                                "description": "Memory in MB (optional)",
                             },
                             "wall_time": {
                                 "type": "string",
-                                "description": "Wall time limit in HH:MM format (optional)"
+                                "description": "Wall time limit in HH:MM format (optional)",
                             },
                             "output_file": {
                                 "type": "string",
-                                "description": "Standard output file path (optional)"
+                                "description": "Standard output file path (optional)",
                             },
                             "error_file": {
                                 "type": "string",
-                                "description": "Standard error file path (optional)"
+                                "description": "Standard error file path (optional)",
                             },
                             "working_directory": {
                                 "type": "string",
-                                "description": "Working directory (optional)"
+                                "description": "Working directory (optional)",
                             },
                             "advanced_options": {
                                 "type": "string",
-                                "description": "Advanced LSF options string for full control (optional)"
-                            }
+                                "description": "Advanced LSF options string for full control (optional)",
+                            },
                         },
-                        "required": ["command"]
-                    }
+                        "required": ["command"],
+                    },
                 ),
                 Tool(
                     name="query_jobs",
@@ -134,22 +135,22 @@ class LSFMCPServer:
                         "properties": {
                             "job_id": {
                                 "type": "string",
-                                "description": "Specific job ID to query (optional)"
+                                "description": "Specific job ID to query (optional)",
                             },
                             "user": {
                                 "type": "string",
-                                "description": "Filter by username (optional)"
+                                "description": "Filter by username (optional)",
                             },
                             "queue": {
                                 "type": "string",
-                                "description": "Filter by queue name (optional)"
+                                "description": "Filter by queue name (optional)",
                             },
                             "status": {
                                 "type": "string",
-                                "description": "Filter by job status (optional)"
-                            }
-                        }
-                    }
+                                "description": "Filter by job status (optional)",
+                            },
+                        },
+                    },
                 ),
                 Tool(
                     name="kill_job",
@@ -159,15 +160,15 @@ class LSFMCPServer:
                         "properties": {
                             "job_id": {
                                 "type": "string",
-                                "description": "Job ID to kill"
+                                "description": "Job ID to kill",
                             },
                             "force": {
                                 "type": "boolean",
-                                "description": "Force kill the job (optional, default: false)"
-                            }
+                                "description": "Force kill the job (optional, default: false)",
+                            },
                         },
-                        "required": ["job_id"]
-                    }
+                        "required": ["job_id"],
+                    },
                 ),
                 Tool(
                     name="list_hosts",
@@ -177,10 +178,10 @@ class LSFMCPServer:
                         "properties": {
                             "host_name": {
                                 "type": "string",
-                                "description": "Specific host name to query (optional)"
+                                "description": "Specific host name to query (optional)",
                             }
-                        }
-                    }
+                        },
+                    },
                 ),
                 Tool(
                     name="list_queues",
@@ -190,10 +191,10 @@ class LSFMCPServer:
                         "properties": {
                             "queue_name": {
                                 "type": "string",
-                                "description": "Specific queue name to query (optional)"
+                                "description": "Specific queue name to query (optional)",
                             }
-                        }
-                    }
+                        },
+                    },
                 ),
                 Tool(
                     name="check_load",
@@ -203,10 +204,10 @@ class LSFMCPServer:
                         "properties": {
                             "host_name": {
                                 "type": "string",
-                                "description": "Specific host to check (optional)"
+                                "description": "Specific host to check (optional)",
                             }
-                        }
-                    }
+                        },
+                    },
                 ),
                 Tool(
                     name="list_host_info",
@@ -216,26 +217,20 @@ class LSFMCPServer:
                         "properties": {
                             "host_name": {
                                 "type": "string",
-                                "description": "Specific host name to query (optional)"
+                                "description": "Specific host name to query (optional)",
                             }
-                        }
-                    }
+                        },
+                    },
                 ),
                 Tool(
                     name="get_cluster_id",
                     description="Get LSF cluster identifier and version information.",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {}
-                    }
+                    inputSchema={"type": "object", "properties": {}},
                 ),
                 Tool(
                     name="get_cluster_info",
                     description="Get comprehensive LSF cluster information via API.",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {}
-                    }
+                    inputSchema={"type": "object", "properties": {}},
                 ),
                 Tool(
                     name="upload_file",
@@ -245,15 +240,15 @@ class LSFMCPServer:
                         "properties": {
                             "local_path": {
                                 "type": "string",
-                                "description": "Path to local file to upload"
+                                "description": "Path to local file to upload",
                             },
                             "remote_path": {
                                 "type": "string",
-                                "description": "Destination path on LSF server"
-                            }
+                                "description": "Destination path on LSF server",
+                            },
                         },
-                        "required": ["local_path", "remote_path"]
-                    }
+                        "required": ["local_path", "remote_path"],
+                    },
                 ),
                 Tool(
                     name="download_file",
@@ -263,15 +258,15 @@ class LSFMCPServer:
                         "properties": {
                             "remote_path": {
                                 "type": "string",
-                                "description": "Path on LSF server"
+                                "description": "Path on LSF server",
                             },
                             "local_path": {
                                 "type": "string",
-                                "description": "Local destination path (optional, returns content if not provided)"
-                            }
+                                "description": "Local destination path (optional, returns content if not provided)",
+                            },
                         },
-                        "required": ["remote_path"]
-                    }
+                        "required": ["remote_path"],
+                    },
                 ),
                 Tool(
                     name="list_files",
@@ -281,11 +276,11 @@ class LSFMCPServer:
                         "properties": {
                             "path": {
                                 "type": "string",
-                                "description": "Directory path to list"
+                                "description": "Directory path to list",
                             }
                         },
-                        "required": ["path"]
-                    }
+                        "required": ["path"],
+                    },
                 ),
                 Tool(
                     name="delete_file",
@@ -295,12 +290,12 @@ class LSFMCPServer:
                         "properties": {
                             "file_path": {
                                 "type": "string",
-                                "description": "Path to file to delete"
+                                "description": "Path to file to delete",
                             }
                         },
-                        "required": ["file_path"]
-                    }
-                )
+                        "required": ["file_path"],
+                    },
+                ),
             ]
 
         @self.server.call_tool()
@@ -345,12 +340,10 @@ class LSFMCPServer:
 
             except Exception as e:
                 logger.error("Error executing tool %s: %s", name, str(e))
-                error_result = {
-                    "success": False,
-                    "error": str(e),
-                    "tool": name
-                }
-                return [TextContent(type="text", text=json.dumps(error_result, indent=2))]
+                error_result = {"success": False, "error": str(e), "tool": name}
+                return [
+                    TextContent(type="text", text=json.dumps(error_result, indent=2))
+                ]
 
     async def run(self):
         """Run the MCP server."""
@@ -361,7 +354,9 @@ class LSFMCPServer:
         try:
             # Don't authenticate immediately - let ensure_authenticated() handle it
             # This prevents the server from crashing if LSF is temporarily unavailable
-            logger.info("LSF MCP Server initialized (authentication will occur on first request)")
+            logger.info(
+                "LSF MCP Server initialized (authentication will occur on first request)"
+            )
 
             # Run the server
             async with stdio_server() as (read_stream, write_stream):
@@ -369,7 +364,7 @@ class LSFMCPServer:
                 await self.server.run(
                     read_stream,
                     write_stream,
-                    self.server.create_initialization_options()
+                    self.server.create_initialization_options(),
                 )
 
         except Exception as e:

@@ -20,4 +20,4 @@ __version__ = "0.1.0"
 # when running with python -m lsf_mcp_server.server
 # Users should import directly: from lsf_mcp_server.server import LSFMCPServer, main
 
-__all__ = ['__version__']
+__all__ = ["__version__"]
