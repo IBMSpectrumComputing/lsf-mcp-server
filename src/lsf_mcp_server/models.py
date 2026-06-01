@@ -15,6 +15,7 @@
 """Pydantic models for request/response validation."""
 
 from typing import Optional
+
 from pydantic import BaseModel, Field
 
 

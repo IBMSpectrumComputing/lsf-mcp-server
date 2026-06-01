@@ -16,6 +16,7 @@
 
 import logging
 from typing import Dict, Optional
+
 from .lsf_client import LSFClient
 
 logger = logging.getLogger(__name__)

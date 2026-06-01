@@ -15,6 +15,7 @@
 """Tests for LSF client."""
 
 import pytest
+
 from lsf_mcp_server.lsf_client import LSFClient
 
 

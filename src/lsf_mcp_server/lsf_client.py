@@ -15,9 +15,10 @@
 """LSF REST API client for making HTTP requests."""
 
 import base64
-import httpx
 import logging
 from typing import Dict, Optional
+
+import httpx
 
 logger = logging.getLogger(__name__)
 

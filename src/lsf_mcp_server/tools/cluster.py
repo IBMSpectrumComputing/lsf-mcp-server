@@ -15,9 +15,10 @@
 """Cluster information tools for LSF."""
 
 import logging
-from typing import Dict, Any, Optional
-from ..lsf_client import LSFClient
+from typing import Any, Dict, Optional
+
 from ..auth import AuthManager
+from ..lsf_client import LSFClient
 
 logger = logging.getLogger(__name__)
 
