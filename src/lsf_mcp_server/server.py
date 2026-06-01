@@ -15,6 +15,7 @@
 """Main MCP server implementation for LSF."""
 
 import asyncio
+import json
 import logging
 import os
 import sys
@@ -337,14 +338,12 @@ class LSFMCPServer:
                     raise ValueError(f"Unknown tool: {name}")
                     
                 # Format result as JSON string
-                import json
                 result_text = json.dumps(result, indent=2)
                 
                 return [TextContent(type="text", text=result_text)]
                 
             except Exception as e:
-                logger.error(f"Error executing tool {name}: {str(e)}")
-                import json
+                logger.error("Error executing tool %s: %s", name, str(e))
                 error_result = {
                     "success": False,
                     "error": str(e),
@@ -355,9 +354,9 @@ class LSFMCPServer:
     async def run(self):
         """Run the MCP server."""
         logger.info("Starting LSF MCP Server")
-        logger.info(f"LSF Server URL: {self.lsf_url}")
-        logger.info(f"LSF Username: {self.lsf_username}")
-        
+        logger.info("LSF Server URL: %s", self.lsf_url)
+        logger.info("LSF Username: %s", self.lsf_username)
+
         try:
             # Don't authenticate immediately - let ensure_authenticated() handle it
             # This prevents the server from crashing if LSF is temporarily unavailable
@@ -373,7 +372,7 @@ class LSFMCPServer:
                 )
                 
         except Exception as e:
-            logger.error(f"Server error: {str(e)}")
+            logger.error("Server error: %s", str(e))
             raise
         finally:
             # Cleanup
@@ -383,7 +382,7 @@ class LSFMCPServer:
                 await self.client.close()
                 logger.info("LSF MCP Server shutdown complete")
             except Exception as e:
-                logger.error(f"Error during cleanup: {str(e)}")
+                logger.error("Error during cleanup: %s", str(e))
 
 
 def main():
@@ -394,7 +393,7 @@ def main():
     except KeyboardInterrupt:
         logger.info("Server interrupted by user")
     except Exception as e:
-        logger.error(f"Fatal error: {str(e)}")
+        logger.error("Fatal error: %s", str(e))
         sys.exit(1)
 
 

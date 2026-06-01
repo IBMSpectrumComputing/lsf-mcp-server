@@ -49,8 +49,8 @@ class AuthManager:
         Raises:
             Exception: If authentication fails
         """
-        logger.info(f"Logging in as user: {self.username}")
-        
+        logger.info("Logging in as user: %s", self.username)
+
         try:
             response = await self.client.post(
                 '/lsf/v1/auth/logon',
@@ -82,7 +82,7 @@ class AuthManager:
             return session_data
             
         except Exception as e:
-            logger.error(f"Authentication failed: {str(e)}")
+            logger.error("Authentication failed: %s", str(e))
             raise Exception(f"Failed to authenticate with LSF API: {str(e)}")
             
     async def logout(self):
@@ -105,7 +105,7 @@ class AuthManager:
             logger.info("Successfully logged out")
             
         except Exception as e:
-            logger.error(f"Logout failed: {str(e)}")
+            logger.error("Logout failed: %s", str(e))
             # Clear session anyway
             self.client.clear_session_token()
             self.session_info = None

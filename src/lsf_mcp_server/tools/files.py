@@ -55,7 +55,7 @@ class FileTools:
         """
         await self.auth.ensure_authenticated()
         
-        logger.info(f"Uploading file: {local_path} -> {remote_path}")
+        logger.info("Uploading file: %s -> %s", local_path, remote_path)
         
         try:
             # Check if local file exists
@@ -81,7 +81,7 @@ class FileTools:
             )
             
             result = response.json()
-            logger.info(f"File uploaded successfully")
+            logger.info("File uploaded successfully")
             
             return {
                 'success': True,
@@ -91,7 +91,7 @@ class FileTools:
             }
             
         except Exception as e:
-            logger.error(f"Failed to upload file: {str(e)}")
+            logger.error("Failed to upload file: %s", str(e))
             return {
                 'success': False,
                 'error': str(e),
@@ -116,7 +116,7 @@ class FileTools:
         """
         await self.auth.ensure_authenticated()
         
-        logger.info(f"Downloading file: {remote_path}")
+        logger.info("Downloading file: %s", remote_path)
         
         try:
             # Encode the remote path as base64
@@ -129,7 +129,7 @@ class FileTools:
                 with open(local_path, 'wb') as f:
                     f.write(response.content)
                     
-                logger.info(f"File downloaded and saved to: {local_path}")
+                logger.info("File downloaded and saved to: %s", local_path)
                 
                 return {
                     'success': True,
@@ -139,7 +139,7 @@ class FileTools:
                 }
             else:
                 # Return content as text
-                logger.info(f"File downloaded successfully")
+                logger.info("File downloaded successfully")
                 
                 return {
                     'success': True,
@@ -149,7 +149,7 @@ class FileTools:
                 }
                 
         except Exception as e:
-            logger.error(f"Failed to download file: {str(e)}")
+            logger.error("Failed to download file: %s", str(e))
             return {
                 'success': False,
                 'error': str(e),
@@ -168,7 +168,7 @@ class FileTools:
         """
         await self.auth.ensure_authenticated()
         
-        logger.info(f"Listing files in: {path}")
+        logger.info("Listing files in: %s", path)
         
         try:
             response = await self.client.get(
@@ -177,7 +177,7 @@ class FileTools:
             )
             
             result = response.json()
-            logger.info(f"Files listed successfully")
+            logger.info("Files listed successfully")
             
             return {
                 'success': True,
@@ -186,7 +186,7 @@ class FileTools:
             }
             
         except Exception as e:
-            logger.error(f"Failed to list files: {str(e)}")
+            logger.error("Failed to list files: %s", str(e))
             return {
                 'success': False,
                 'error': str(e),
@@ -205,7 +205,7 @@ class FileTools:
         """
         await self.auth.ensure_authenticated()
         
-        logger.info(f"Deleting file: {file_path}")
+        logger.info("Deleting file: %s", file_path)
         
         try:
             # Encode the file path as base64
@@ -214,16 +214,15 @@ class FileTools:
             response = await self.client.delete(f'/lsf/v1/files/{encoded_path}')
             
             result = response.json()
-            logger.info(f"File deleted successfully")
+            logger.info("File deleted successfully")
             
             return {
                 'success': True,
                 'file_path': file_path,
                 'result': result
             }
-            
         except Exception as e:
-            logger.error(f"Failed to delete file: {str(e)}")
+            logger.error("Failed to delete file: %s", str(e))
             return {
                 'success': False,
                 'error': str(e),

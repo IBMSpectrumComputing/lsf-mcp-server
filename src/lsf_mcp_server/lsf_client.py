@@ -96,7 +96,7 @@ class LSFClient:
         # Merge headers
         headers = self._get_headers(kwargs.pop('headers', None))
         
-        logger.debug(f"{method} {url}")
+        logger.debug("%s %s", method, url)
         
         try:
             response = await self._client.request(
@@ -106,7 +106,7 @@ class LSFClient:
                 **kwargs
             )
             
-            logger.debug(f"Response status: {response.status_code}")
+            logger.debug("Response status: %s", response.status_code)
             
             # Raise for 4xx and 5xx status codes
             response.raise_for_status()
@@ -114,10 +114,10 @@ class LSFClient:
             return response
             
         except httpx.HTTPStatusError as e:
-            logger.error(f"HTTP error: {e.response.status_code} - {e.response.text}")
+            logger.error("HTTP error: %s - %s", e.response.status_code, e.response.text)
             raise
         except httpx.RequestError as e:
-            logger.error(f"Request error: {str(e)}")
+            logger.error("Request error: %s", str(e))
             raise
             
     async def get(self, endpoint: str, **kwargs) -> httpx.Response:

@@ -49,7 +49,7 @@ class ClusterTools:
         """
         await self.auth.ensure_authenticated()
         
-        logger.info(f"Executing LSF command: {command}")
+        logger.info("Executing LSF command: %s", command)
         
         try:
             response = await self.client.post(
@@ -59,7 +59,7 @@ class ClusterTools:
             )
             
             result = response.json()
-            logger.info(f"Command executed successfully")
+            logger.info("Command executed successfully")
             
             return {
                 'success': True,
@@ -68,7 +68,7 @@ class ClusterTools:
             }
             
         except Exception as e:
-            logger.error(f"Failed to execute command: {str(e)}")
+            logger.error("Failed to execute command: %s", str(e))
             return {
                 'success': False,
                 'error': str(e),
@@ -172,7 +172,7 @@ class ClusterTools:
             }
             
         except Exception as e:
-            logger.error(f"Failed to get cluster info: {str(e)}")
+            logger.error("Failed to get cluster info: %s", str(e))
             return {
                 'success': False,
                 'error': str(e)

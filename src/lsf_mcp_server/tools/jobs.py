@@ -14,7 +14,6 @@
 
 """Job management tools for LSF."""
 
-import json
 import logging
 from typing import Dict, Any, Optional
 from ..lsf_client import LSFClient
@@ -124,7 +123,7 @@ class JobTools:
                 working_directory
             )
             
-        logger.info(f"Submitting job: {lsf_command}")
+        logger.info("Submitting job: %s", lsf_command)
         
         try:
             response = await self.client.post(
@@ -134,7 +133,7 @@ class JobTools:
             )
             
             result = response.json()
-            logger.info(f"Job submitted successfully: {result}")
+            logger.info("Job submitted successfully: %s", result)
             
             return {
                 'success': True,
@@ -143,7 +142,7 @@ class JobTools:
             }
             
         except Exception as e:
-            logger.error(f"Failed to submit job: {str(e)}")
+            logger.error("Failed to submit job: %s", str(e))
             return {
                 'success': False,
                 'error': str(e),
@@ -192,7 +191,7 @@ class JobTools:
             cmd_parts.append(job_id)
         
         lsf_command = " ".join(cmd_parts)
-        logger.info(f"Querying jobs: {lsf_command}")
+        logger.info("Querying jobs: %s", lsf_command)
         
         try:
             response = await self.client.post(
@@ -202,7 +201,7 @@ class JobTools:
             )
             
             result = response.json()
-            logger.info(f"Job query successful")
+            logger.info("Job query successful")
             
             return {
                 'success': True,
@@ -211,7 +210,7 @@ class JobTools:
             }
             
         except Exception as e:
-            logger.error(f"Failed to query jobs: {str(e)}")
+            logger.error("Failed to query jobs: %s", str(e))
             return {
                 'success': False,
                 'error': str(e),
@@ -244,7 +243,7 @@ class JobTools:
         cmd_parts.append(job_id)
         
         lsf_command = " ".join(cmd_parts)
-        logger.info(f"Killing job: {lsf_command}")
+        logger.info("Killing job: %s", lsf_command)
         
         try:
             response = await self.client.post(
@@ -254,7 +253,7 @@ class JobTools:
             )
             
             result = response.json()
-            logger.info(f"Job killed successfully: {result}")
+            logger.info("Job killed successfully: %s", result)
             
             return {
                 'success': True,
@@ -264,7 +263,7 @@ class JobTools:
             }
             
         except Exception as e:
-            logger.error(f"Failed to kill job: {str(e)}")
+            logger.error("Failed to kill job: %s", str(e))
             return {
                 'success': False,
                 'error': str(e),
