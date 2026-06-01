@@ -308,35 +308,36 @@ class LSFMCPServer:
             """Handle tool calls."""
             try:
                 # Route to appropriate tool handler
-                if name == "submit_job":
-                    result = await self.job_tools.submit_job(**arguments)
-                elif name == "query_jobs":
-                    result = await self.job_tools.query_jobs(**arguments)
-                elif name == "kill_job":
-                    result = await self.job_tools.kill_job(**arguments)
-                elif name == "list_hosts":
-                    result = await self.cluster_tools.list_hosts(**arguments)
-                elif name == "list_queues":
-                    result = await self.cluster_tools.list_queues(**arguments)
-                elif name == "check_load":
-                    result = await self.cluster_tools.check_load(**arguments)
-                elif name == "list_host_info":
-                    result = await self.cluster_tools.list_host_info(**arguments)
-                elif name == "get_cluster_id":
-                    result = await self.cluster_tools.get_cluster_id()
-                elif name == "get_cluster_info":
-                    result = await self.cluster_tools.get_cluster_info()
-                elif name == "upload_file":
-                    result = await self.file_tools.upload_file(**arguments)
-                elif name == "download_file":
-                    result = await self.file_tools.download_file(**arguments)
-                elif name == "list_files":
-                    result = await self.file_tools.list_files(**arguments)
-                elif name == "delete_file":
-                    result = await self.file_tools.delete_file(**arguments)
-                else:
-                    raise ValueError(f"Unknown tool: {name}")
-                    
+                match name:
+                    case "submit_job":
+                        result = await self.job_tools.submit_job(**arguments)
+                    case "query_jobs":
+                        result = await self.job_tools.query_jobs(**arguments)
+                    case "kill_job":
+                        result = await self.job_tools.kill_job(**arguments)
+                    case "list_hosts":
+                        result = await self.cluster_tools.list_hosts(**arguments)
+                    case "list_queues":
+                        result = await self.cluster_tools.list_queues(**arguments)
+                    case "check_load":
+                        result = await self.cluster_tools.check_load(**arguments)
+                    case "list_host_info":
+                        result = await self.cluster_tools.list_host_info(**arguments)
+                    case "get_cluster_id":
+                        result = await self.cluster_tools.get_cluster_id()
+                    case "get_cluster_info":
+                        result = await self.cluster_tools.get_cluster_info()
+                    case "upload_file":
+                        result = await self.file_tools.upload_file(**arguments)
+                    case "download_file":
+                        result = await self.file_tools.download_file(**arguments)
+                    case "list_files":
+                        result = await self.file_tools.list_files(**arguments)
+                    case "delete_file":
+                        result = await self.file_tools.delete_file(**arguments)
+                    case _:
+                        raise ValueError(f"Unknown tool: {name}")
+
                 # Format result as JSON string
                 result_text = json.dumps(result, indent=2)
                 
