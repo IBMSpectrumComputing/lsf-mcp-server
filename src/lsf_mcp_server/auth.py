@@ -49,7 +49,7 @@ class AuthManager:
         Raises:
             Exception: If authentication fails
         """
-        logger.info("Logging in as user: {self.username}")
+        logger.info("Logging in as user: %s", self.username)
 
         try:
             response = await self.client.post(
