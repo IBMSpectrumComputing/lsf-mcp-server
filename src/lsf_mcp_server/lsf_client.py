@@ -26,18 +26,21 @@ logger = logging.getLogger(__name__)
 class LSFClient:
     """HTTP client for LSF REST API."""
     
-    def __init__(self, base_url: str, timeout: float = 30.0):
+    def __init__(self, base_url: str, timeout: float = 30.0, ca_cert: Optional[str] = None):
         """
         Initialize LSF API client.
         
         Args:
             base_url: Base URL of the LSF REST API (e.g., http://host:8088)
             timeout: Request timeout in seconds
+            ca_cert: Path to CA certificate file for SSL verification (optional)
         """
         self.base_url = base_url.rstrip('/')
         self.timeout = timeout
         self.session_token: Optional[str] = None
-        self._client = httpx.AsyncClient(timeout=timeout)
+        is_https = self.base_url.lower().startswith('https://')
+        ssl_verify = (ca_cert if ca_cert else True) if is_https else False
+        self._client = httpx.AsyncClient(timeout=timeout, verify=ssl_verify)
         
     async def close(self):
         """Close the HTTP client."""
