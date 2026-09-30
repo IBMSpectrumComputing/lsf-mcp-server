@@ -16,3 +16,4 @@ src/lsf_mcp_server/tools/__init__.py
 src/lsf_mcp_server/tools/cluster.py
 src/lsf_mcp_server/tools/files.py
 src/lsf_mcp_server/tools/jobs.py
+tests/test_lsf_client.py
