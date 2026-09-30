@@ -21,7 +21,7 @@ import os
 import sys
 from typing import Any
 
-import mcp_types as types
+from mcp import types
 from mcp.server import Server
 from mcp.server.stdio import stdio_server
 
@@ -81,7 +81,7 @@ class LSFMCPServer:
             types.Tool(
                 name="submit_job",
                 description="Submit a job to the LSF cluster. Supports both simple mode (common parameters) and advanced mode (full LSF options).",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {
                         "command": {
@@ -131,7 +131,7 @@ class LSFMCPServer:
             types.Tool(
                 name="query_jobs",
                 description="Query job status and information. Can filter by job ID, user, queue, or status.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {
                         "job_id": {
@@ -156,7 +156,7 @@ class LSFMCPServer:
             types.Tool(
                 name="kill_job",
                 description="Kill a running or pending job.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {
                         "job_id": {
@@ -174,7 +174,7 @@ class LSFMCPServer:
             types.Tool(
                 name="list_hosts",
                 description="List LSF cluster hosts with their status and load information.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {
                         "host_name": {
@@ -187,7 +187,7 @@ class LSFMCPServer:
             types.Tool(
                 name="list_queues",
                 description="List available LSF queues with their configuration and status.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {
                         "queue_name": {
@@ -200,7 +200,7 @@ class LSFMCPServer:
             types.Tool(
                 name="check_load",
                 description="Check system load on LSF cluster hosts.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {
                         "host_name": {
@@ -213,7 +213,7 @@ class LSFMCPServer:
             types.Tool(
                 name="list_host_info",
                 description="Get detailed host information including resources and configuration.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {
                         "host_name": {
@@ -226,7 +226,7 @@ class LSFMCPServer:
             types.Tool(
                 name="get_cluster_id",
                 description="Get LSF cluster identifier and version information.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {}
                 }
@@ -234,7 +234,7 @@ class LSFMCPServer:
             types.Tool(
                 name="get_cluster_info",
                 description="Get comprehensive LSF cluster information via API.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {}
                 }
@@ -242,7 +242,7 @@ class LSFMCPServer:
             types.Tool(
                 name="upload_file",
                 description="Upload a file to the LSF server.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {
                         "local_path": {
@@ -260,7 +260,7 @@ class LSFMCPServer:
             types.Tool(
                 name="download_file",
                 description="Download a file from the LSF server.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {
                         "remote_path": {
@@ -278,7 +278,7 @@ class LSFMCPServer:
             types.Tool(
                 name="list_files",
                 description="List files in a directory on the LSF server.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {
                         "path": {
@@ -292,7 +292,7 @@ class LSFMCPServer:
             types.Tool(
                 name="delete_file",
                 description="Delete a file on the LSF server.",
-                inputSchema={
+                input_schema={
                     "type": "object",
                     "properties": {
                         "file_path": {
@@ -361,7 +361,7 @@ class LSFMCPServer:
             error_result = {"success": False, "error": str(e), "tool": name}
             return types.CallToolResult(
                 content=[types.TextContent(type="text", text=json.dumps(error_result, indent=2))],
-                isError=True,
+                is_error=True,
             )
 
     async def run(self):
