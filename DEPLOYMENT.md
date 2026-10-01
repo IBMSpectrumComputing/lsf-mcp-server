@@ -55,8 +55,9 @@ Before installing the LSF MCP Server, ensure you have:
    ```
 
 2. **Access to an LSF REST API server**
-   - LSF REST API URL (e.g., `http://lsf-server.example.com:8088`)
+   - LSF REST API URL (e.g., `https://lsf-server.example.com:8443`)
    - Valid LSF credentials (username and password)
+   - CA certificate file (`.pem`) if the LSF REST API uses a self-signed or private CA certificate
 
 3. **An MCP-compatible client** (one of):
    - IBM Bob
@@ -104,28 +105,32 @@ IBM Bob is an AI coding assistant that supports MCP servers.
 
 #### Configuration File Location
 
+Bob's global MCP configuration file (applies to all workspaces):
+
 ```
-~/Library/Application Support/IBM Bob/User/globalStorage/ibm.bob-code/settings/mcp_settings.json
+~/.bob/settings/mcp.json
 ```
 
 #### Configuration Steps
 
-1. **Open the MCP settings file:**
+1. **Open (or create) the MCP config file:**
    ```bash
-   open ~/Library/Application\ Support/IBM\ Bob/User/globalStorage/ibm.bob-code/settings/mcp_settings.json
+   mkdir -p ~/.bob/settings
+   open ~/.bob/settings/mcp.json
    ```
 
-2. **Add the LSF MCP server configuration:**
+2. **Add the LSF MCP server configuration** (merge into any existing `mcpServers` object):
    ```json
    {
      "mcpServers": {
        "lsf": {
-         "command": "/absolute/path/to/lsf-mcp-server/venv/bin/python",
+         "command": "/absolute/path/to/lsf-mcp-server/venv/bin/python3.10",
          "args": ["-m", "lsf_mcp_server.server"],
          "env": {
-           "LSF_SERVER_URL": "http://lsf-server.example.com:8088",
-           "LSF_USERNAME": "your-lsf-username",
-           "LSF_PASSWORD": "your-lsf-password"
+           "LSF_SERVER_URL": "https://lsf-server.example.com:8443",
+           "LSF_USERNAME": "${env:LSF_USERNAME}",
+           "LSF_PASSWORD": "${env:LSF_PASSWORD}",
+           "LSF_CA_CERT": "${env:LSF_CA_CERT}"
          }
        }
      }
@@ -133,12 +138,13 @@ IBM Bob is an AI coding assistant that supports MCP servers.
    ```
 
 3. **Important notes:**
-   - Replace `/absolute/path/to/lsf-mcp-server` with the actual path
+   - Replace `/absolute/path/to/lsf-mcp-server` with the actual installation path
    - Use the **absolute path** to the Python binary in your virtual environment
-   - Replace `your-lsf-username` and `your-lsf-password` with your actual credentials
-   - Replace `lsf-server.example.com:8088` with your LSF REST API URL
+   - Use `${env:VAR_NAME}` references for credentials rather than hardcoding them — Bob expands these from the environment it was launched in
+   - Replace `https://lsf-server.example.com:8443` with your LSF REST API URL — both `http://` and `https://` are supported and must match the protocol and port configured in your LSF Web Service instance
+   - `LSF_CA_CERT` is optional — omit it if your LSF REST API uses a certificate signed by a public CA, or if connecting over plain HTTP
 
-4. **Restart IBM Bob** to load the new MCP server
+4. **Bob hot-reloads** the config on save — no restart needed if a workspace folder is open. If Bob shows the server as disconnected, open the MCP panel and click Reload.
 
 #### Verification
 
@@ -188,9 +194,10 @@ On Windows:
          "command": "/path/to/lsf-mcp-server/venv/bin/python",
          "args": ["-m", "lsf_mcp_server.server"],
          "env": {
-           "LSF_SERVER_URL": "http://lsf-server.example.com:8088",
+           "LSF_SERVER_URL": "https://lsf-server.example.com:8443",
            "LSF_USERNAME": "your_username",
-           "LSF_PASSWORD": "your_password"
+           "LSF_PASSWORD": "your_password",
+           "LSF_CA_CERT": "/path/to/ca-cert.pem"
          }
        }
      }
@@ -272,9 +279,10 @@ Watson Orchestrate typically uses a configuration file or environment-based setu
          "command": "/path/to/lsf-mcp-server/venv/bin/python",
          "args": ["-m", "lsf_mcp_server.server"],
          "env": {
-           "LSF_SERVER_URL": "http://lsf-server.example.com:8088",
+           "LSF_SERVER_URL": "https://lsf-server.example.com:8443",
            "LSF_USERNAME": "your_username",
-           "LSF_PASSWORD": "your_password"
+           "LSF_PASSWORD": "your_password",
+           "LSF_CA_CERT": "/path/to/ca-cert.pem"
          }
        }
      }
@@ -290,9 +298,10 @@ If Watson Orchestrate supports environment-based configuration:
 ```bash
 export WATSON_ORCHESTRATE_MCP_LSF_COMMAND="/path/to/venv/bin/python"
 export WATSON_ORCHESTRATE_MCP_LSF_ARGS="-m lsf_mcp_server.server"
-export LSF_SERVER_URL="http://lsf-server.example.com:8088"
+export LSF_SERVER_URL="https://lsf-server.example.com:8443"
 export LSF_USERNAME="your_username"
 export LSF_PASSWORD="your_password"
+export LSF_CA_CERT="/path/to/ca-cert.pem"   # optional — omit if not using a private CA
 ```
 
 #### Verification
@@ -342,9 +351,10 @@ or
          "command": "/path/to/lsf-mcp-server/venv/bin/python",
          "args": ["-m", "lsf_mcp_server.server"],
          "env": {
-           "LSF_SERVER_URL": "http://lsf-server.example.com:8088",
+           "LSF_SERVER_URL": "https://lsf-server.example.com:8443",
            "LSF_USERNAME": "your_username",
-           "LSF_PASSWORD": "your_password"
+           "LSF_PASSWORD": "your_password",
+           "LSF_CA_CERT": "/path/to/ca-cert.pem"
          }
        }
      }
@@ -355,9 +365,10 @@ or
    ```bash
    MCP_LSF_COMMAND=/path/to/lsf-mcp-server/venv/bin/python
    MCP_LSF_ARGS=-m lsf_mcp_server.server
-   LSF_SERVER_URL=http://lsf-server.example.com:8088
+   LSF_SERVER_URL=https://lsf-server.example.com:8443
    LSF_USERNAME=your_username
    LSF_PASSWORD=your_password
+   LSF_CA_CERT=/path/to/ca-cert.pem
    ```
 
 5. **Restart LibreChat:**
@@ -392,20 +403,30 @@ Most MCP clients use a similar JSON configuration format:
       "command": "/absolute/path/to/python",
       "args": ["-m", "lsf_mcp_server.server"],
       "env": {
-        "LSF_SERVER_URL": "http://lsf-server.example.com:8088",
+        "LSF_SERVER_URL": "https://lsf-server.example.com:8443",
         "LSF_USERNAME": "your_username",
-        "LSF_PASSWORD": "your_password"
+        "LSF_PASSWORD": "your_password",
+        "LSF_CA_CERT": "/path/to/ca-cert.pem"
       }
     }
   }
 }
 ```
 
+#### Environment Variables Reference
+
+| Variable | Required | Description |
+|---|---|---|
+| `LSF_SERVER_URL` | **Yes** | Full URL to the LSF REST API, including protocol and port. Both `http://` and `https://` are supported — the value must match the protocol and port configured in your LSF Web Service instance (e.g., `http://host:8080` or `https://host:8443`). |
+| `LSF_USERNAME` | **Yes** | LSF username for authentication |
+| `LSF_PASSWORD` | **Yes** | LSF password for authentication |
+| `LSF_CA_CERT` | No | Absolute path to a CA certificate (`.pem`) for verifying the LSF REST API's TLS certificate. Required when the server uses a self-signed or private CA certificate. Omit for public CA certs or plain HTTP. |
+
 #### Key Configuration Elements
 
 1. **command**: Absolute path to Python binary in virtual environment
 2. **args**: Module execution argument (`-m lsf_mcp_server.server`)
-3. **env**: Environment variables for LSF connection
+3. **env**: Environment variables for LSF connection — `LSF_CA_CERT` is optional but needed for HTTPS with a private CA
 
 #### Manual Testing
 
@@ -414,9 +435,10 @@ You can test the MCP server manually using stdio:
 ```bash
 cd /path/to/lsf-mcp-server
 source venv/bin/activate
-export LSF_SERVER_URL="http://lsf-server.example.com:8088"
+export LSF_SERVER_URL="https://lsf-server.example.com:8443"
 export LSF_USERNAME="your_username"
 export LSF_PASSWORD="your_password"
+export LSF_CA_CERT="/path/to/ca-cert.pem"   # optional
 python -m lsf_mcp_server.server
 ```
 
@@ -485,9 +507,10 @@ The server will start and wait for MCP protocol messages on stdin.
 
 #### IBM Bob
 
-- Check Bob's output panel for error messages
-- Verify the Python path points to the venv Python binary
-- Restart Bob after configuration changes
+- Config file location: `~/.bob/settings/mcp.json` (not `~/Library/Application Support/...`)
+- Check Bob's MCP panel for live error messages from the server process
+- Verify the Python path points to the venv Python binary (use `ls /path/to/venv/bin/python3.10`)
+- Bob hot-reloads on config save; if the server shows as disconnected, click Reload in the MCP panel
 
 #### Claude Desktop
 

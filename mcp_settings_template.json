@@ -1,12 +1,12 @@
 {
   "mcpServers": {
     "lsf": {
-      "command": "/path/to/lsf-mcp-server/venv/bin/python",
+      "command": "/opt/ibm/lsf-mcp-server/venv/bin/python3.10",
       "args": ["-m", "lsf_mcp_server.server"],
       "env": {
-        "LSF_SERVER_URL": "http://lsf-server.example.com:8088",
-        "LSF_USERNAME": "YOUR_LSF_USERNAME_HERE",
-        "LSF_PASSWORD": "YOUR_LSF_PASSWORD_HERE"
+        "LSF_SERVER_URL": "https://gauss03-dmz:8448",
+        "LSF_USERNAME": "jswelch",
+        "LSF_PASSWORD": "Blahblah17!"
       }
     }
   }
