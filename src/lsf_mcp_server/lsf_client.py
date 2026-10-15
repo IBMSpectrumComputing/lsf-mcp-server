@@ -44,6 +44,10 @@ class LSFClient:
             ssl_verify: ssl.SSLContext | bool = False
         elif ca_cert:
             ssl_context = ssl.create_default_context(cafile=ca_cert)
+            # Python 3.13+ enables VERIFY_X509_STRICT by default, which rejects
+            # CA certs whose Basic Constraints aren't marked critical (common for
+            # LSF-issued CAs). Chain and hostname verification remain enabled.
+            ssl_context.verify_flags &= ~ssl.VERIFY_X509_STRICT
             ssl_verify = ssl_context
         else:
             ssl_verify = True
