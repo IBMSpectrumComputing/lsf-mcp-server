@@ -110,6 +110,19 @@ class TestLSFClient:
             _, kwargs = mock_client_cls.call_args
             assert kwargs["verify"] is mock_ctx
 
+    def test_ssl_context_disables_x509_strict(self):
+        """Custom CA context must clear VERIFY_X509_STRICT but keep verification on."""
+        real_ctx = ssl.create_default_context()
+        real_ctx.verify_flags |= ssl.VERIFY_X509_STRICT
+        with patch("ssl.create_default_context", return_value=real_ctx), \
+             patch("httpx.AsyncClient") as mock_client_cls:
+            LSFClient("https://example.com:8443", ca_cert="/path/to/ca.pem")
+            _, kwargs = mock_client_cls.call_args
+            ctx = kwargs["verify"]
+            assert not (ctx.verify_flags & ssl.VERIFY_X509_STRICT)
+            assert ctx.verify_mode == ssl.CERT_REQUIRED
+            assert ctx.check_hostname is True
+
     def test_ssl_verify_is_ssl_context_not_string(self):
         """verify= must be an ssl.SSLContext, never a bare path string."""
         mock_ctx = MagicMock(spec=ssl.SSLContext)
